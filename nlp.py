@@ -1,16 +1,9 @@
 import spacy
-
 from spacytextblob.spacytextblob import SpacyTextBlob
 
+import getData
 #push every line of toyota_camry.txt into a string list
-def getListCamry():
-    dict = []
-    with open('toyota_camry.txt', 'r') as f:
-        for line in f:
-            line=line.strip()
-            line=line.lower()
-            dict.append(line)
-    return dict
+
 def buildNlp():
         nlp = spacy.load('en_core_web_sm')
         nlp.add_pipe('spacytextblob')
@@ -59,7 +52,7 @@ class Summary:
                 
                
     
-lst = getListCamry()
+lst = getData.getListCamry()
 sent=lst
 
 nlp = buildNlp()
