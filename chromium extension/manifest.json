@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Reading time",
+  "name": "review Summarizer",
   "version": "1.0",
   "description": "Add the reading time to Chrome Extension documentation articles",
+  "action":{
+    "default_popup":"hello.html"
+  },
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
       "matches": [
-        "https://www.yelp.com/*"
+        "https://www.yelp.com/biz/*"
       ]
     }
   ]

@@ -1,19 +1,26 @@
-
-
-
 from bs4 import BeautifulSoup
-
+from typing import TypedDict, List
 import httpx
 import asyncio
 import json
-
+import requests
 BASE_HEADERS = {
-    "authority": "www.yelp.com",
-     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"#,
-    # "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    # "accept-language": "en-US;en;q=0.9",
-    # "accept-encoding": "gzip, deflate, br",
-    }
+    "Host": "127.0.0.1:65432",
+"Connection": "keep-alive",
+"Cache-Control": "max-age=0",
+"sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+"sec-ch-ua-mobile": "?0",
+"sec-ch-ua-platform": "macOS",
+"Upgrade-Insecure-Requests": "1",
+"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36",
+"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+"Sec-Fetch-Site": "none",
+"Sec-Fetch-Mode": "navigate",
+"Sec-Fetch-User": "?1",
+"Sec-Fetch-Dest": "document",
+"Accept-Encoding": "gzip, deflate, br",
+"Accept-Language":" en-GB,en-US;q=0.9,en;q=0.8",
+}
     
 class Review():
     id: str
@@ -25,6 +32,7 @@ class Review():
 
 def __getBusinessId(soup):
     # Find the meta tag with name="yelp-biz-id" and get its content attribute
+
     business_id = soup.find("meta", attrs={"name":"yelp-biz-id"})["content"]
     return business_id
 
@@ -52,32 +60,52 @@ async def __scrapeReviews(businessid: str, session: httpx.AsyncClient):
 
 
 async def __run(businessUrl):
+
     # Use async with to create an asynchronous context manager
     async with httpx.AsyncClient(headers=BASE_HEADERS) as session:
         # Await the session.get coroutine and assign the result to response
         response = await session.get(businessUrl)
         # Get the text attribute of the response object
         webpage = response.text
-     
+        
+
+        soup = BeautifulSoup(webpage, "html.parser")
+        return soup
+        businessId = __getBusinessId(soup)
+        return businessId
+        # reviews= await __scrapeReviews(businessId,session=session)
+        # return reviews
+        
+async def __runZenRows(businessUrl)-> List[Review]:
+    # Use async with to create an asynchronous context manager
+    apikey = 'c26b7a0c051038de02f1c3187704c88d6a74e847'
+    params = {
+    'url': businessUrl,
+    'apikey': apikey,
+}
+    async with httpx.AsyncClient() as session:
+        # Await the session.get coroutine and assign the result to response
+        response = await session.get('https://api.zenrows.com/v1/', params=params)
+        # Get the text attribute of the response object
+        webpage = response.text
+        
+
         soup = BeautifulSoup(webpage, "html.parser")
         
         businessId = __getBusinessId(soup)
+   
         reviews= await __scrapeReviews(businessId,session=session)
         return reviews
 
 
 
-
-        
-
 # Call the async function using asyncio.run()
 
 
 def getReviews(businessUrl):
+    print("getting reviews")
+    ret = asyncio.run(__runZenRows(businessUrl))
+    return ret
 
-    ret = asyncio.run(__run(businessUrl))
-    print(ret)
 
-
-    
     
