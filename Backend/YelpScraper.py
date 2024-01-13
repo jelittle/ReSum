@@ -3,7 +3,13 @@ from typing import TypedDict, List
 import httpx
 import asyncio
 import json
+from dotenv import load_dotenv
+import os
 import requests
+
+load_dotenv()
+apikey = os.getenv('API_KEY')
+
 BASE_HEADERS = {
     "Host": "127.0.0.1:65432",
 "Connection": "keep-alive",
@@ -78,7 +84,7 @@ async def __run(businessUrl):
         
 async def __runZenRows(businessUrl)-> List[Review]:
     # Use async with to create an asynchronous context manager
-    apikey = 'c26b7a0c051038de02f1c3187704c88d6a74e847'
+   
     params = {
     'url': businessUrl,
     'apikey': apikey,
@@ -102,10 +108,9 @@ async def __runZenRows(businessUrl)-> List[Review]:
 # Call the async function using asyncio.run()
 
 
-def getReviews(businessUrl):
+async def getReviews(businessUrl: str):
     print("getting reviews")
-    ret = asyncio.run(__runZenRows(businessUrl))
+    ret = await asyncio.to_thread(__runZenRows, businessUrl)
     return ret
-
 
     

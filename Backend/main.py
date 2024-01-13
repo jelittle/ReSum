@@ -1,19 +1,16 @@
-import nlp
+import asyncio
 import json
-# import getData
 import YelpScraper
+import nlp
 #todo: filter data for non english, check for bot dumps, 
-
-def getReviewSummaryYelp(url,model):
-    reviews=YelpScraper.getReviews(url)
+async def getReviewSummaryYelp(url, model):
+    reviews = asyncio.run(YelpScraper.getReviews(url)) 
     print("getting summary")
-    comments = [x['comment']['text'] for x in reviews]
-    summary = nlp.Summary(comments,model)
-    #turn summary.summary into json
+    comments = [x['comment']['text'] async for x in reviews]
+    summary = nlp.Summary(comments, model)
+    # Turn summary.summary into JSON
     return json.dumps(summary.summary)
-    
-    
-    
+
     
     
 

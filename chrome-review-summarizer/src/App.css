@@ -1,0 +1,41 @@
+/* body {
+  box-sizing: border-box;
+}
+
+.App {
+  min-height: 250px;
+  min-width: 400px;
+  background: linear-gradient(to right bottom, #2999f5, #1859d1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.App h1 {
+  font-size: 18px;
+  color: #fff;
+  text-align: center;
+} */
+
+.App {
+  min-height: 250px;
+  min-width: 200px;
+  background: linear-gradient(to right bottom, #2999f5, #1859d1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rest of the CSS styles... */
+
+.small-area {
+  width: 200px;
+}
+
+.medium-area {
+  width: 400px;
+}
+
+.large-area {
+  width: 600px;
+}
