@@ -2,16 +2,18 @@ from fastapi import FastAPI
 from nlp import buildNlp
 import main
 import uvicorn
+import tracemalloc
+
+
 
 app = FastAPI()
 nlp = buildNlp()
 
 @app.get('/scrape/{path:path}')
 async def scrape(path: str):
-    print("test")
-    print(path)
-    summary = main.getReviewSummaryYelp(path, nlp)
-    print(summary)
+
+    summary =await main.getReviewSummaryYelp(path, nlp)
+  
     return summary
 
 # if __name__ == "__main__":

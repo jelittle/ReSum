@@ -36,13 +36,13 @@ class Review():
     comment: dict
     rating: int
 
-def __getBusinessId(soup):
+def __getBusinessId(soup:BeautifulSoup):
     # Find the meta tag with name="yelp-biz-id" and get its content attribute
 
     business_id = soup.find("meta", attrs={"name":"yelp-biz-id"})["content"]
     return business_id
 
-async def __scrapeReviews(businessid: str, session: httpx.AsyncClient):
+async def __scrapeReviews(businessid: str, session: httpx.AsyncClient)-> List[Review]:
     #scrape first page
     firstPage = await session.get(
         f"https://www.yelp.com/biz/{businessid}/review_feed?rl=en&q=&sort_by=relevance_desc&start=0"
@@ -61,6 +61,7 @@ async def __scrapeReviews(businessid: str, session: httpx.AsyncClient):
         response = await page
         data = json.loads(response.text)
         reviews.extend(data["reviews"])
+
     return reviews
     
 
@@ -84,24 +85,28 @@ async def __run(businessUrl):
         
 async def __runZenRows(businessUrl)-> List[Review]:
     # Use async with to create an asynchronous context manager
-   
+    load_dotenv()
+    apikey = os.getenv('API_KEY')
+
     params = {
     'url': businessUrl,
     'apikey': apikey,
 }
-    async with httpx.AsyncClient() as session:
+    async with httpx.AsyncClient(timeout=10) as session:
         # Await the session.get coroutine and assign the result to response
         response = await session.get('https://api.zenrows.com/v1/', params=params)
+        
         # Get the text attribute of the response object
         webpage = response.text
+     
         
-
         soup = BeautifulSoup(webpage, "html.parser")
         
         businessId = __getBusinessId(soup)
    
         reviews= await __scrapeReviews(businessId,session=session)
-        return reviews
+    return reviews
+    
 
 
 
@@ -110,7 +115,8 @@ async def __runZenRows(businessUrl)-> List[Review]:
 
 async def getReviews(businessUrl: str):
     print("getting reviews")
-    ret = await asyncio.to_thread(__runZenRows, businessUrl)
+   
+    ret = await __runZenRows(businessUrl)
     return ret
 
     
